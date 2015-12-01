@@ -1,0 +1,49 @@
+## ##############################################################################
+##
+##  Project     : Masters Thesis at Technical University of Denmark, DTU Compute            
+##	Title		: Hardware accelerators for the T-CREST multi-core platform
+##	Student	    : Istvan Szonyi (s131153@student.dtu.dk) 
+##
+##	Description	: Modelsim project script for compilation and simulation
+##
+##  Revision    : Check history on GitHubs
+################################################################################
+
+# The vlib command creates the work library
+#rm -rf work
+vlib work
+
+# When the work library is already created the vlib command
+# gives a warning, that is OK.
+
+################################################################
+# The order of the vcom statements is important, the hierachy
+# should be compiled bottom-up.
+# The top most entity should be compiled last.
+# And the components that do not instantiate other components
+# should be compiled first.
+################################################################
+
+vcom -quiet ../IP/fft_64.vho
+vcom -quiet ../src/cdc.vhd
+vcom -quiet ../src/dp_ram.vhd
+vcom -quiet ../src/input_buffer_delay.vhd
+vcom -quiet ../src/wr_ptr.vhd
+vcom -quiet ../src/rd_ptr.vhd
+vcom -quiet ../src/cb_ctrl.vhd
+vcom -quiet ../src/fft_controller_top.vhd
+vcom -quiet ../tb/tb_fft_controller.vhd
+
+
+# The -quiet option disables output from the vcom command
+# that is not error or warning messages.
+
+################################################################
+# The vsim command starts the testbench design unit and runs
+# the simulation
+
+vsim -novopt tb_fft_controller
+
+run 2 ms
+
+################################################################

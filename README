@@ -1,0 +1,12 @@
+Msc Theis project at DTU Compute http://www.compute.dtu.dk
+
+Thesis topic : Hardware accelerators for the T-CREST multi-core platform
+Student : Istvan Szonyi (s131153@student.dtu.dk) 
+
+Description:
+This project investigates the possibility to integrate stateful hardware accelerators into the T-CREST/RTEMP platform (http://www.t-crest.org) preserving the time predictability of the system. Stateful hardware accelerators allow achieving high speed-ups, since they can supports complex iterative calculations and be more application specific. A common example of stateful hardware accelerator is a fast Fourier transform unit, which shows significant speed-up of execution times, compared to a pure software based implementation. The M.Sc. thesis research topic investigates on how these complex accelerators can be designed and integrated in an efficient way into a time-predictable architecture and, more generally, investigates on the trade-offs between different integration architectures for real-time systems.
+
+The present implementation is designed to accelerate FFT computations on the Patmos processor (https://github.com/t-crest/patmos), a time-predictable VLIW processor developed for the T-CREST paltform. The project is using the Altera's FFT IP core (v13.0) and for implementation it targets the Altera® DE2 Development and Education board.
+ 
+
+

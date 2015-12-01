@@ -1,0 +1,252 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+PACKAGE ram_package IS
+   CONSTANT ram_width : INTEGER := 16;
+   CONSTANT ram_depth : INTEGER := 1024;
+
+   TYPE word IS ARRAY(0 to ram_width - 1) of std_logic;
+   TYPE ram IS ARRAY(0 to ram_depth - 1) of word;
+   SUBTYPE address_vector IS INTEGER RANGE 0 to ram_depth - 1;
+
+END ram_package;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+USE work.ram_package.ALL;
+
+entity fft_controller_top is
+port(
+
+  rd_clk_i : in std_logic;
+  wr_clk_i : in std_logic;
+  rst_i: in std_logic;
+  start_cmd_i : in std_logic;
+  stop_cmd_i : in std_logic;
+  wr_i : in std_logic;
+  rd_i : in std_logic;
+  rd_addr_i : in std_logic_vector(9 downto 0);
+
+
+-- OCP slave IF
+
+--  MCmd          : in  std_logic_vector(2 downto 0);
+--  MAddr         : in  std_logic_vector(15 downto 0);
+--  MData         : in  std_logic_vector(31 downto 0);
+--  MByteEn       : in  std_logic_vector(3 downto 0);
+--  SResp         : out std_logic_vector(1 downto 0);
+--  SData         : out std_logic_vector(31 downto 0);
+
+-- Motor interface
+  result_o : out std_logic_vector (15 downto 0);
+  m1_samples_i: in std_logic_vector(15 downto 0)
+ );
+
+ end fft_controller_top;
+
+ architecture rtl of fft_controller_top is
+
+  -- circular buffer ctrl
+   component cb_ctrl is
+     port(
+     wr_clk_i : in std_logic;
+     rd_clk_i : in std_logic;
+     rst_i : in std_logic;
+     wr_i : in std_logic;
+     rd_i : in std_logic;
+     rd_init_i : in std_logic;
+     wr_init_i : in std_logic;
+     wr_addr_o : out std_logic_vector(9 downto 0);
+     rd_addr_o : out std_logic_vector(9 downto 0);
+     wr_init_done_o : out std_logic;
+     wr_window_done_o : out std_logic;
+     rd_samples_done_o : out std_logic
+     );
+   end component;
+
+   --dual port RAM
+   component dp_ram is
+     port(
+      data		: IN word;
+ 		  rdaddress		: IN address_vector;
+ 		  rdclock		: IN STD_LOGIC;
+ 		  rden		: IN STD_LOGIC;
+ 		  wraddress		: IN address_vector;
+ 		  wrclock		: IN STD_LOGIC;
+ 		  wren		: IN STD_LOGIC;
+ 		  q		: OUT word
+     );
+   end component;
+
+   component stream_ins is
+     port(
+      clk_i : in std_logic;
+      rst_i : in STD_LOGIC;
+      start_cmd_i : in std_logic;
+      stop_cmd_i : in std_logic;
+      -- AVALON-ST IF
+      sink_valid	: IN STD_LOGIC;
+      sink_sop	: IN STD_LOGIC;
+      sink_eop	: IN STD_LOGIC;
+      --sink_real	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      --sink_imag	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      --sink_error	: IN STD_LOGIC_VECTOR (1 DOWNTO 0);
+      source_ready	: out STD_LOGIC;
+      sink_ready	: in STD_LOGIC;
+      --source_error	: OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
+      source_sop	: OUT STD_LOGIC;
+      source_eop	: OUT STD_LOGIC;
+      source_valid	: OUT STD_LOGIC;
+      --source_real	: OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+      --source_imag	: OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+      --buffer ctrl
+      rd_o  : out std_logic;
+      wr_init_o : out std_logic;
+      rd_init_o : out std_logic;
+      wr_init_done_i : in std_logic;
+      wr_window_done_i : in std_logic;
+      rd_samples_done_i : in std_logic;
+     --output buffer ctrl
+      result_wr_en_o : out std_logic;
+      result_wr_addr_o : out std_logic_vector (9 downto 0)
+     );
+   end component;
+
+   component fft_1024 is
+     PORT (
+      clk	: IN STD_LOGIC;
+		  reset_n	: IN STD_LOGIC;
+		  fftpts_in	: IN STD_LOGIC_VECTOR (10 DOWNTO 0);
+		  inverse	: IN STD_LOGIC;
+      --AVALON-ST
+		  sink_valid	: IN STD_LOGIC;
+		  sink_sop	: IN STD_LOGIC;
+		  sink_eop	: IN STD_LOGIC;
+		  sink_real	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+		  sink_imag	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+		  sink_error	: IN STD_LOGIC_VECTOR (1 DOWNTO 0);
+		  source_ready	: IN STD_LOGIC;
+		  fftpts_out	: OUT STD_LOGIC_VECTOR (10 DOWNTO 0);
+		  sink_ready	: OUT STD_LOGIC;
+		  source_error	: OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
+		  source_sop	: OUT STD_LOGIC;
+		  source_eop	: OUT STD_LOGIC;
+		  source_valid	: OUT STD_LOGIC;
+		  source_real	: OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+		  source_imag	: OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+	);
+end component;
+
+signal rd_en_ibuf, rd_init_s, rd_samples_done_s : std_logic;
+signal wr_init_s, wr_init_done_s, wr_window_done_s : std_logic;
+signal wr_addr_ibuf, rd_addr_ibuf : std_logic_vector(9 downto 0);
+
+signal data_ibuf : std_logic_vector(15 downto 0);
+signal result_fft : std_logic_vector(15 downto 0);
+signal result_wr_addr_s : std_logic_vector(9 downto 0);
+signal result_wr_en_s : std_logic;
+
+signal sink_valid_fft, sink_sop_fft, sink_eop_fft, sink_ready_fft : std_logic;
+signal source_valid_stmi, source_sop_stmi, source_eop_stmi, source_ready_stmi : std_logic;
+
+begin
+
+  ibuf_inst : dp_ram
+  PORT MAP (
+		data	 => m1_samples_i,
+		rdaddress	 => rd_addr_ibuf,
+		rdclock	 => rd_clk_i,
+		rden	 => rd_en_ibuf,
+		wraddress	 => wr_addr_ibuf,
+		wrclock	 => wr_clk_i,
+		wren	 => wr_i,
+		q	 => data_ibuf
+	);
+
+  output_buffer_inst : dp_ram
+  PORT MAP (
+    data	 => result_fft,
+    rdaddress	 => rd_addr_i,
+    rdclock	 => rd_clk_i,
+    rden	 => rd_i,
+    wraddress	 => result_wr_addr_s,
+    wrclock	 => rd_clk_i,
+    wren	 => result_wr_en_s,
+    q	 => result_o
+  );
+
+  -- circular buffer ctrl
+   cb_ctrl_inst : cb_ctrl
+     port map(
+     wr_clk_i => wr_clk_i,
+     rd_clk_i => rd_clk_i,
+     rst_i => rst_i,
+     wr_i => wr_i,
+     rd_i => rd_en_ibuf,
+     rd_init_i => rd_init_s,
+     wr_init_i => wr_init_s,
+     wr_addr_o => wr_addr_ibuf,
+     rd_addr_o => rd_addr_ibuf,
+     wr_init_done_o => wr_init_done_s,
+     wr_window_done_o => wr_window_done_s,
+     rd_samples_done_o => rd_samples_done_s
+     );
+
+
+
+    stream_ins_inst : stream_ins
+       port map(
+        clk_i => rd_clk_i,
+        rst_i => rst_i,
+        start_cmd_i => start_cmd_i,
+        stop_cmd_i => stop_cmd_i,
+        -- AVALON-ST IF
+        sink_valid	=> sink_valid_fft,
+        sink_sop	=> sink_sop_fft,
+        sink_eop	=> sink_eop_fft,
+        --sink_error	: IN STD_LOGIC_VECTOR (1 DOWNTO 0);
+        source_ready	=> source_ready_stmi,
+        sink_ready	=> sink_ready_fft,
+        --source_error	: OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
+        source_sop	=> source_sop_stmi,
+        source_eop	=> source_eop_stmi,
+        source_valid	=> source_valid_stmi,
+
+        --buffer ctrl
+        rd_o  => rd_en_ibuf,
+        wr_init_o => wr_init_s,
+        rd_init_o => rd_init_s,
+        wr_init_done_i => wr_init_done_s,
+        wr_window_done_i => wr_window_done_s,
+        rd_samples_done_i => rd_samples_done_s,
+       --output buffer ctrl
+        result_wr_en_o => result_wr_en_s,
+        result_wr_addr_o => result_wr_addr_s
+       );
+
+      fft_1024_inst : fft_1024
+         PORT MAP (
+          clk	=> rd_clk_i,
+          reset_n	=> rst_i,
+          fftpts_in	=> "10000000000",
+          inverse	=> '0',
+          --AVALON-ST
+          sink_valid	=> source_valid_stmi,
+          sink_sop	=> source_sop_stmi,
+          sink_eop	=> source_eop_stmi,
+          sink_real	=> data_ibuf,
+          sink_imag	=> (others => '0'),
+          sink_error	=> (others => '0'),
+          source_ready	=>  source_ready_stmi,
+          fftpts_out	=> open,
+          sink_ready	=> sink_ready_fft,
+          source_error	=> open,
+          source_sop	=> sink_sop_fft,
+          source_eop	=> sink_eop_fft,
+          source_valid	=> sink_valid_fft,
+          source_real	=> result_fft,
+          source_imag	=> open
+      );
+
+
+end rtl;
