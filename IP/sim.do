@@ -33,7 +33,10 @@ vcom -quiet ../src/rd_ptr.vhd
 vcom -quiet ../src/cb_ctrl.vhd
 vcom -quiet ../src/stream_ins.vhd
 vcom -quiet ../src/fft_controller_top.vhd
-vcom -quiet ../tb/tb_fft_controller.vhd
+vcom -quiet ../src/ocp_slave_ctrl.vhd
+vcom -quiet ../src/fft_hw_accelerator_top.vhd
+vcom -quiet ../tb/tb_fft_hw_accelerator.vhd
+
 
 
 # The -quiet option disables output from the vcom command
@@ -43,10 +46,10 @@ vcom -quiet ../tb/tb_fft_controller.vhd
 # The vsim command starts the testbench design unit and runs
 # the simulation
 
-vsim -novopt tb_fft_controller
+vsim -novopt tb_fft_hw_accelerator
 
 do wave.do
 
-run 2 ms
+run 2.2 ms
 
 ################################################################
