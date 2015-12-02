@@ -125,7 +125,6 @@ wait for 12500ns;
 
  wait for 6250ns;
  start_cmd_s <= '1';
- wait for 12501ns;
  start_s <= '1';
 
  wait for 2ns;
