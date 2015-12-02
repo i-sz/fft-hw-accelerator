@@ -42,6 +42,17 @@ architecture testbench of tb_fft_hw_accelerator is
    );
  end component;
 
+
+ component sp_rom IS
+   PORT
+   (
+     address		: IN STD_LOGIC_VECTOR (6 DOWNTO 0);
+     clock		: IN STD_LOGIC  := '1';
+     rden		: IN STD_LOGIC  := '1';
+     q		: OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+   );
+ end component;
+
 signal rd_clk_s, wr_clk_s, rst_s, wr_s : std_logic;
 signal start_cmd_s, stop_cmd_s, start_s, stop_s, read_status_s, read_buffer_s : std_logic;
 signal m1_samples_s : std_logic_vector(15 downto 0);
@@ -51,6 +62,8 @@ signal maddr_s : std_logic_vector(15 downto 0);
 signal mdata_s : std_logic_vector(31 downto 0);
 signal sresp_s : std_logic_vector(1 downto 0);
 signal sdata_s : std_logic_vector(31 downto 0);
+signal address_sig : unsigned(6 downto 0);
+
 begin
 
 DUT : fft_hw_accelerator_top
@@ -67,6 +80,13 @@ port map(
   SResp => sresp_s,
   SData => sdata_s
 );
+
+IO_DEVICE : sp_rom PORT MAP (
+		address	 => std_logic_vector(address_sig),
+		clock	 => wr_clk_s,
+		rden	 => start_cmd_s,
+		q	 => m1_samples_s
+	);
 
 
 slow_clock :process
@@ -103,8 +123,9 @@ wait for 12500ns;
  wait for 12500ns;
  rst_s <= '0';
 
- wait for 100ns;
+ wait for 6250ns;
  start_cmd_s <= '1';
+ wait for 12501ns;
  start_s <= '1';
 
  wait for 2ns;
@@ -168,6 +189,17 @@ begin
   end if;
 end process;
 
+process(wr_clk_s, rst_s)
+begin
+  if (rst_s = '1' or stop_cmd_s ='1') then
+    address_sig <= (others => '0');
+  elsif(wr_clk_s'event and wr_clk_s ='1') then
+    if (start_cmd_s = '1') then
+      address_sig <= address_sig + 1;
+    end if;
+  end if;
+end process;
+
 
 
 
@@ -178,49 +210,42 @@ end process;
  -----------------------------------------------------------------------------------------------
 -- Read input data from files
 -----------------------------------------------------------------------------------------------
-input_samples : process(wr_clk_s) is
-  file r_file     : text open read_mode is "fft_64_real_input.txt";
-  variable data_r : integer;
-  variable rdata  : line;
-begin
-  if(rst_s = '1') then
-    m1_samples_s  <= std_logic_vector(to_signed(0, 16));
---    wr_s <= '0';
-  elsif rising_edge(wr_clk_s) then
-    -- send in NUM_FRAMES_c of data or until the end of the file
-    if not endfile(r_file) and (stop_cmd_s = '0') then
-      if(start_cmd_s = '1') then
-        readline(r_file, rdata);
-        read(rdata, data_r);
-        m1_samples_s  <= std_logic_vector(to_signed(data_r, 16));
---        wr_s <= '1';
-      else
-        m1_samples_s  <= m1_samples_s;
---        wr_s <= wr_s;
-      end if;
-    else
-      m1_samples_s <= std_logic_vector(to_signed(0, 16));
---      wr_s <= '0';
-    end if;
-  end if;
 
-end process input_samples;
+-- input_samples : process(wr_clk_s) is
+--  file r_file     : text open read_mode is "fft_64_real_input.txt";
+--  variable data_r : integer;
+--  variable rdata  : line;
+--begin
+--  if(rst_s = '1') then
+--    m1_samples_s  <= std_logic_vector(to_signed(0, 16));
+--    wr_s <= '0';
+--  elsif rising_edge(wr_clk_s) then
+--    -- send in NUM_FRAMES_c of data or until the end of the file
+--    if not endfile(r_file) and (stop_cmd_s = '0') then
+--      if(start_cmd_s = '1') then
+--        readline(r_file, rdata);
+--        read(rdata, data_r);
+--        m1_samples_s  <= std_logic_vector(to_signed(data_r, 16));
+--        wr_s <= '1';
+--      else
+--        m1_samples_s  <= m1_samples_s;
+--        wr_s <= wr_s;
+--      end if;
+--    else
+--      m1_samples_s <= std_logic_vector(to_signed(0, 16));
+--      wr_s <= '0';
+--    end if;
+--  end if;
+
+--end process input_samples;
 
 write_enable : process(wr_clk_s)
 begin
   if(rst_s = '1') then
       wr_s <= '0';
-  elsif falling_edge(wr_clk_s) then
-    if stop_cmd_s = '0' then
-      if start_cmd_s = '1' then
-        wr_s <= '1';
-      else
-        wr_s <= wr_s;
-      end if;
-    else
-      wr_s <= '0';
-    end if;
-  end if;
+  elsif rising_edge(wr_clk_s) then
+        wr_s <= start_cmd_s;
+end if;
 end process write_enable;
 
 

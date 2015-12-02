@@ -1,8 +1,8 @@
 ## ##############################################################################
 ##
-##  Project     : Masters Thesis at Technical University of Denmark, DTU Compute            
+##  Project     : Masters Thesis at Technical University of Denmark, DTU Compute
 ##	Title		: Hardware accelerators for the T-CREST multi-core platform
-##	Student	    : Istvan Szonyi (s131153@student.dtu.dk) 
+##	Student	    : Istvan Szonyi (s131153@student.dtu.dk)
 ##
 ##	Description	: Modelsim project script for compilation and simulation
 ##
@@ -25,6 +25,7 @@ vlib work
 ################################################################
 
 vcom -quiet fft_64.vho
+vcom -quiet sp_rom.vhd
 vcom -quiet ../src/cdc.vhd
 vcom -quiet ../src/dp_ram.vhd
 vcom -quiet ../src/input_buffer_delay.vhd

@@ -1,0 +1,152 @@
+-- Copyright (C) 1991-2013 Altera Corporation
+-- Your use of Altera Corporation's design tools, logic functions 
+-- and other software and tools, and its AMPP partner logic 
+-- functions, and any output files from any of the foregoing 
+-- (including device programming or simulation files), and any 
+-- associated documentation or information are expressly subject 
+-- to the terms and conditions of the Altera Program License 
+-- Subscription Agreement, Altera MegaCore Function License 
+-- Agreement, or other applicable license agreement, including, 
+-- without limitation, that your use is for the sole purpose of 
+-- programming logic devices manufactured by Altera and sold by 
+-- Altera or its authorized distributors.  Please refer to the 
+-- applicable agreement for further details.
+
+-- Quartus II generated Memory Initialization File (.mif)
+
+WIDTH=16;
+DEPTH=128;
+
+ADDRESS_RADIX=UNS;
+DATA_RADIX=DEC;
+
+CONTENT BEGIN
+	0    :   11149;
+	1    :   19940;
+	2    :   -21273;
+	3    :   -29513;
+	4    :   -11917;
+	5    :   24778;
+	6    :   -14269;
+	7    :   24793;
+	8    :   76;
+	9    :   2133;
+	10   :   2141;
+	11   :   -15802;
+	12   :   27194;
+	13   :   -1774;
+	14   :   2550;
+	15   :   -31184;
+	16   :   29743;
+	17   :   6713;
+	18   :   -8247;
+	19   :   27624;
+	20   :   31034;
+	21   :   10741;
+	22   :   -10328;
+	23   :   -11828;
+	24   :   15670;
+	25   :   -21838;
+	26   :   32374;
+	27   :   15030;
+	28   :   7628;
+	29   :   -26477;
+	30   :   20998;
+	31   :   829;
+	32   :   20697;
+	33   :   9734;
+	34   :   20403;
+	35   :   25947;
+	36   :   16169;
+	37   :   32376;
+	38   :   20223;
+	39   :   -22052;
+	40   :   -13679;
+	41   :   19983;
+	42   :   -10505;
+	43   :   9791;
+	44   :   3681;
+	45   :   -29287;
+	46   :   -8851;
+	47   :   26210;
+	48   :   -5818;
+	49   :   -11899;
+	50   :   -24791;
+	51   :   -24417;
+	52   :   24414;
+	53   :   6924;
+	54   :   32722;
+	55   :   21397;
+	56   :   -23585;
+	57   :   -5532;
+	58   :   -24351;
+	59   :   -21337;
+	60   :   22751;
+	61   :   4363;
+	62   :   -25042;
+	63   :   5594;
+	64   :   21683;
+	65   :   -31922;
+	66   :   -24669;
+	67   :   2713;
+	68   :   -1160;
+	69   :   10170;
+	70   :   -20839;
+	71   :   4565;
+	72   :   -1006;
+	73   :   25569;
+	74   :   -483;
+	75   :   31977;
+	76   :   -119;
+	77   :   -6898;
+	78   :   -27360;
+	79   :   18956;
+	80   :   -26187;
+	81   :   -7133;
+	82   :   -30361;
+	83   :   18776;
+	84   :   -30135;
+	85   :   -7259;
+	86   :   -17803;
+	87   :   25472;
+	88   :   7492;
+	89   :   -22838;
+	90   :   -17606;
+	91   :   -24303;
+	92   :   14773;
+	93   :   -8017;
+	94   :   22955;
+	95   :   20814;
+	96   :   28122;
+	97   :   -9556;
+	98   :   -3273;
+	99   :   28611;
+	100  :   1952;
+	101  :   4287;
+	102  :   -31485;
+	103  :   10059;
+	104  :   2170;
+	105  :   -31974;
+	106  :   10016;
+	107  :   4562;
+	108  :   -31842;
+	109  :   15288;
+	110  :   24974;
+	111  :   -27737;
+	112  :   -19060;
+	113  :   18229;
+	114  :   -30182;
+	115  :   29022;
+	116  :   -7158;
+	117  :   8090;
+	118  :   6670;
+	119  :   32633;
+	120  :   -10911;
+	121  :   18522;
+	122  :   -21790;
+	123  :   2672;
+	124  :   28168;
+	125  :   -26002;
+	126  :   2197;
+	127  :   22144;
+END;

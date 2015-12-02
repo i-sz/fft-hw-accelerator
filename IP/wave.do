@@ -11,13 +11,16 @@ add wave -noupdate /tb_fft_hw_accelerator/start_s
 add wave -noupdate /tb_fft_hw_accelerator/stop_s
 add wave -noupdate /tb_fft_hw_accelerator/read_status_s
 add wave -noupdate /tb_fft_hw_accelerator/read_buffer_s
-add wave -noupdate /tb_fft_hw_accelerator/m1_samples_s
 add wave -noupdate /tb_fft_hw_accelerator/mcmd_s
 add wave -noupdate /tb_fft_hw_accelerator/maddr_s
-add wave -noupdate /tb_fft_hw_accelerator/maddr_v
 add wave -noupdate /tb_fft_hw_accelerator/mdata_s
 add wave -noupdate /tb_fft_hw_accelerator/sresp_s
 add wave -noupdate /tb_fft_hw_accelerator/sdata_s
+add wave -noupdate /tb_fft_hw_accelerator/IO_DEVICE/clock
+add wave -noupdate -radix unsigned /tb_fft_hw_accelerator/IO_DEVICE/address
+add wave -noupdate /tb_fft_hw_accelerator/IO_DEVICE/rden
+add wave -noupdate -radix unsigned /tb_fft_hw_accelerator/IO_DEVICE/q
+add wave -noupdate -radix unsigned /tb_fft_hw_accelerator/m1_samples_s
 add wave -noupdate -divider OCP_SLAVE_CTRL
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/rd_clk_i
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/rst_i
@@ -36,17 +39,26 @@ add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/obuf_rd_addr_o
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/state
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/next_state
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/clr_status_r
-add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/buffer_rd_data
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/result_ready_r
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/next_SResp
 add wave -noupdate /tb_fft_hw_accelerator/DUT/ocp_slave_ctrl_inst/status_zero_pad
 add wave -noupdate -divider IBUF
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/clk_i
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/rst_i
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/wr_i
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/data_i
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/wr_o
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/data_o
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/wr_d
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/wr_dd
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/data_d
+add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_delay_inst/data_dd
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/rdclock
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/wrclock
-add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/data
-add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/wraddress
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/rdaddress
+add wave -noupdate -radix unsigned /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/wraddress
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/wren
+add wave -noupdate -radix decimal /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/data
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/rden
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/q
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/ibuf_inst/ram_block
@@ -130,7 +142,7 @@ add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/obuf_inst/rden
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/obuf_inst/q
 add wave -noupdate /tb_fft_hw_accelerator/DUT/fft_ctrl_inst/obuf_inst/ram_block
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2025115 ns} 0}
+WaveRestoreCursors {{Cursor 1} {56250 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 194
 configure wave -valuecolwidth 100
@@ -146,4 +158,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {2310 us}
+WaveRestoreZoom {0 ns} {182622 ns}
