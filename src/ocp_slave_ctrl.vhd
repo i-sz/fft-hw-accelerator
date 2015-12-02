@@ -53,9 +53,8 @@ architecture rtl of ocp_slave_ctrl is
 
   signal state, next_state : state_type;
   signal clr_status_r          : std_logic;
-  signal buffer_rd_data : std_logic_vector(15 downto 0);
   signal result_ready_r : std_logic_vector(31 downto 0);
-  signal next_SResp : std_logic_vector(1 downto 0);
+  signal next_SResp, Sresp_d : std_logic_vector(1 downto 0);
   signal status_zero_pad : std_logic_vector(30 downto 0) := (others => '0');
 
 
@@ -71,6 +70,7 @@ begin
 			SResp_o <= next_SResp;
 		end if;
 	end process;
+
 
 
 

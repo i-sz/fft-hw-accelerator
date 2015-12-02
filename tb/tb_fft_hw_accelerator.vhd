@@ -46,8 +46,8 @@ signal rd_clk_s, wr_clk_s, rst_s, wr_s : std_logic;
 signal start_cmd_s, stop_cmd_s, start_s, stop_s, read_status_s, read_buffer_s : std_logic;
 signal m1_samples_s : std_logic_vector(15 downto 0);
 signal mcmd_s : std_logic_vector(2 downto 0);
-signal maddr_s : unsigned(15 downto 0);
-signal maddr_v : std_logic_vector(15 downto 0);
+signal maddr_d : unsigned(15 downto 0);
+signal maddr_s : std_logic_vector(15 downto 0);
 signal mdata_s : std_logic_vector(31 downto 0);
 signal sresp_s : std_logic_vector(1 downto 0);
 signal sdata_s : std_logic_vector(31 downto 0);
@@ -61,7 +61,7 @@ port map(
   wr_i => wr_s,
   ch0_data_i => m1_samples_s,
   MCmd => mcmd_s,
-  MAddr => std_logic_vector(maddr_s),
+  MAddr => maddr_s,
   MData => mdata_s,
   MByteEn => "0000",
   SResp => sresp_s,
@@ -119,7 +119,7 @@ stop_s <= '1';
 wait for 2ns;
 stop_s <= '0';
 
-wait for 10ns;
+wait for 11ns;
 read_buffer_s <= '1';
 wait for 128ns;
 read_buffer_s <= '0';
@@ -128,7 +128,7 @@ wait for 10ns;
 
  end process;
 
-ocp_master : process(rd_clk_s, start_cmd_s, stop_cmd_s, read_buffer_s) is
+ocp_master : process(rd_clk_s, rst_s, maddr_d, start_cmd_s, stop_cmd_s) is
 begin
   if (rst_s = '1') then
     mcmd_s <= (others => '0');
@@ -145,7 +145,7 @@ begin
         mdata_s <= X"00000001";
       elsif (read_buffer_s ='1') then
         mcmd_s <= "010";
-        maddr_s <= maddr_s + 1;
+        maddr_s <= std_logic_vector(maddr_d);
         mdata_s <= X"00000000";
       else
         mcmd_s <= (others => '0');
@@ -154,6 +154,21 @@ begin
   end if;
 end if;
 end process;
+
+process(rd_clk_s, rst_s)
+begin
+  if (rst_s = '1') then
+    maddr_d <= (others => '0');
+  elsif(rd_clk_s'event and rd_clk_s ='1') then
+    if (maddr_d = x"003F") then
+      maddr_d <= (others => '0');
+    elsif (read_buffer_s ='1') then
+      maddr_d <= maddr_d + 1;
+    end if;
+  end if;
+end process;
+
+
 
 
 
